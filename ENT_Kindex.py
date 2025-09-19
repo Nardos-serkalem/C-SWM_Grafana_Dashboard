@@ -10,7 +10,6 @@ from scipy.signal import medfilt
 from scipy.stats import zscore
 from prometheus_client import Gauge, start_http_server
 
-# ------------------- CONFIG -------------------
 len_days = 3
 update_interval_minutes = 10  
 k9_limit = 500 
@@ -19,13 +18,10 @@ ftp_path = "/pub/home/obs/data/iaga2002/ENT0/"
 station_code = "ent"
 temp_dir = tempfile.gettempdir()
 
-# ------------------- LOGGING -------------------
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
-# ------------------- PROMETHEUS METRIC -------------------
 k_index_gauge = Gauge("geomagnetic_k_index", "K-index value", ["station"])
 
-# ------------------- FTP FUNCTIONS -------------------
 def list_ftp_files(ftp, path):
     files = []
     ftp.cwd(path)
@@ -70,7 +66,6 @@ def get_ftp_files():
         logging.error(f"FTP connection error: {e}")
         return []
 
-# ------------------- DATA PROCESSING -------------------
 def read_iaga2002(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -143,12 +138,11 @@ def calculate_k_index(minute_time_float, minute_comp_x, minute_comp_y, k9):
     k_values[k_values == 0] = 0.25
     return np.array(k_values), np.array(timestamps_float)
 
-# ------------------- PROMETHEUS EXPOSER -------------------
+# promethus expose
 def expose_k_index(k_values, station_name="ENT"):
     if len(k_values) > 0:
         k_index_gauge.labels(station=station_name).set(float(k_values[-1]))
 
-# ------------------- MAIN LOOP -------------------
 def main_loop():
     while True:
         try:
@@ -183,9 +177,7 @@ def main_loop():
             logging.error(f"Error in main loop: {e}")
             time.sleep(60)
 
-# ------------------- RUN -------------------
 if __name__ == "__main__":
-    # Start Prometheus HTTP server at port 8000
     start_http_server(8000)
     logging.info("Prometheus exporter started at http://localhost:8000/metrics")
     main_loop()

@@ -298,7 +298,7 @@ def plot_k_indices_with_derivatives(data, k_indices, k_times, station_name=""):
     axs[-1].tick_params(axis="x", which="minor", labelsize=8)
     
     plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.savefig("ENT_Kindex.png")
+    plt.savefig("Kindex.png")
     plt.close()
 
 def main_loop():
